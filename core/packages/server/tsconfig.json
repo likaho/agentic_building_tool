@@ -12,6 +12,7 @@
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "sourceMap": true,
         "strictPropertyInitialization": false,
+        "resolveJsonModule": true,
         "declaration": true
     },
     "include": ["src/**/*.ts"],

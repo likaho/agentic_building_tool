@@ -8,11 +8,12 @@ import { useTheme } from '@mui/material/styles'
 import { Avatar, Box, ButtonBase, Typography, Stack, TextField } from '@mui/material'
 
 // icons
-import { IconSettings, IconChevronLeft, IconDeviceFloppy, IconPencil, IconCheck, IconX, IconCode } from '@tabler/icons-react'
+import { IconSettings, IconChevronLeft, IconDeviceFloppy, IconPencil, IconCheck, IconX, IconCode, IconBuildingStore } from '@tabler/icons-react'
 
 // project imports
 import Settings from '@/views/settings'
 import SaveChatflowDialog from '@/ui-component/dialog/SaveChatflowDialog'
+import PublishChatflowDialog from '@/ui-component/dialog/PublishChatflowDialog'
 import APICodeDialog from '@/views/chatflows/APICodeDialog'
 import ViewMessagesDialog from '@/ui-component/dialog/ViewMessagesDialog'
 import ChatflowConfigurationDialog from '@/ui-component/dialog/ChatflowConfigurationDialog'
@@ -32,7 +33,7 @@ import ViewLeadsDialog from '@/ui-component/dialog/ViewLeadsDialog'
 
 // ==============================|| CANVAS HEADER ||============================== //
 
-const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlow, handleLoadFlow }) => {
+const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handlePublishFlow, handleDeleteFlow, handleLoadFlow }) => {
     const theme = useTheme()
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -43,6 +44,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
     const [flowName, setFlowName] = useState('')
     const [isSettingsOpen, setSettingsOpen] = useState(false)
     const [flowDialogOpen, setFlowDialogOpen] = useState(false)
+    const [publishDialogOpen, setPublishDialogOpen] = useState(false)
     const [apiDialogOpen, setAPIDialogOpen] = useState(false)
     const [apiDialogProps, setAPIDialogProps] = useState({})
     const [viewMessagesDialogOpen, setViewMessagesDialogOpen] = useState(false)
@@ -53,7 +55,6 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
     const [upsertHistoryDialogProps, setUpsertHistoryDialogProps] = useState({})
     const [chatflowConfigurationDialogOpen, setChatflowConfigurationDialogOpen] = useState(false)
     const [chatflowConfigurationDialogProps, setChatflowConfigurationDialogProps] = useState({})
-
     const title = isAgentCanvas ? 'Agents' : 'Chatflow'
 
     const updateChatflowApi = useApi(chatflowsApi.updateChatflow)
@@ -166,12 +167,14 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
             chatflowid: chatflow.id,
             chatflowApiKeyId: chatflow.apikeyid,
             isFormDataRequired,
-            isSessionMemory,
-            isAgentCanvas
+            isSessionMemory
         })
         setAPIDialogOpen(true)
     }
 
+    const onPublishChatflowClick = () => {
+        setPublishDialogOpen(true)
+    }
     const onSaveChatflowClick = () => {
         if (chatflow.id) handleSaveFlow(flowName)
         else setFlowDialogOpen(true)
@@ -181,6 +184,13 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
         setFlowDialogOpen(false)
         handleSaveFlow(flowName)
     }
+
+    const onConfirmPublishNFT = async (chatflowDescription, chatflowOwnerAddress, chatflowGas) => {   
+        const response = await handlePublishFlow(chatflowDescription, chatflowOwnerAddress, chatflowGas)
+        console.log(response)
+        setPublishDialogOpen(false);
+    }
+
 
     useEffect(() => {
         if (updateChatflowApi.data) {
@@ -352,6 +362,27 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
                             </Avatar>
                         </ButtonBase>
                     )}
+                    <ButtonBase title={`Publish ${title}`} sx={{ borderRadius: '50%', mr: 2 }}>
+                        <Avatar
+                            variant='rounded'
+                            sx={{
+                                ...theme.typography.commonAvatar,
+                                ...theme.typography.mediumAvatar,
+                                transition: 'all .2s ease-in-out',
+                                background: theme.palette.canvasHeader.deployLight,
+                                color: theme.palette.canvasHeader.deployDark,
+                                '&:hover': {
+                                    background: theme.palette.canvasHeader.deployDark,
+                                    color: theme.palette.canvasHeader.deployLight
+                                }
+                            }}
+                            color='inherit'
+                            onClick={onPublishChatflowClick}
+                        >
+                            <IconBuildingStore stroke={1.5} size='1.3rem' />
+                        </Avatar>
+                    </ButtonBase>
+
                     <ButtonBase title={`Save ${title}`} sx={{ borderRadius: '50%', mr: 2 }}>
                         <Avatar
                             variant='rounded'
@@ -412,6 +443,16 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
                 onCancel={() => setFlowDialogOpen(false)}
                 onConfirm={onConfirmSaveName}
             />
+            <PublishChatflowDialog
+                show={publishDialogOpen}                                
+                dialogProps={{
+                    title: `Publish New ${title}`,
+                    confirmButtonName: 'Publish',
+                    cancelButtonName: 'Cancel'
+                }}
+                onCancel={() => setPublishDialogOpen(false)}
+                onConfirm={onConfirmPublishNFT}
+            />            
             <APICodeDialog show={apiDialogOpen} dialogProps={apiDialogProps} onCancel={() => setAPIDialogOpen(false)} />
             <ViewMessagesDialog
                 show={viewMessagesDialogOpen}
@@ -437,6 +478,7 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, handleSaveFlow, handleDeleteFlo
 CanvasHeader.propTypes = {
     chatflow: PropTypes.object,
     handleSaveFlow: PropTypes.func,
+    handlePublishFlow: PropTypes.func,
     handleDeleteFlow: PropTypes.func,
     handleLoadFlow: PropTypes.func,
     isAgentCanvas: PropTypes.bool

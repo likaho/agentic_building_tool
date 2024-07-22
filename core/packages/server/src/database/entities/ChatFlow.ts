@@ -40,6 +40,27 @@ export class ChatFlow implements IChatFlow {
     @Column({ nullable: true, type: 'text' })
     type?: ChatflowType
 
+    @Column({ nullable: true, type: 'varchar' })
+    ownerAddress?: string
+
+    @Column({ nullable: true, type: 'varchar' })
+    tokenId?: string
+
+    @Column({ nullable: true, type: 'varchar' })
+    nftAddress?: string    
+
+    @Column({ nullable: true })
+    isPublished?: boolean
+
+    @Column({ nullable: true, type: 'integer' })
+    usageCount?: number
+
+    @Column({ nullable: true, type: 'integer'  })
+    gas?: number
+
+    @Column({ nullable: true, type: 'text' })
+    description?: string
+
     @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date

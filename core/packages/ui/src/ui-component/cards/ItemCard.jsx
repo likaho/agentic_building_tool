@@ -7,6 +7,7 @@ import { Box, Grid, Typography, useTheme } from '@mui/material'
 
 // project imports
 import MainCard from '@/ui-component/cards/MainCard'
+import { TooltipWithParser } from '@/ui-component/tooltip/TooltipWithParser'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
@@ -56,7 +57,7 @@ const ItemCard = ({ data, images, onClick }) => {
                                         flexShrink: 0,
                                         marginRight: 10,
                                         borderRadius: '50%',
-                                        backgroundImage: `url(${data.iconSrc})`,
+                                        background: `url(${data.iconSrc})`,
                                         backgroundSize: 'contain',
                                         backgroundRepeat: 'no-repeat',
                                         backgroundPosition: 'center center'
@@ -88,6 +89,11 @@ const ItemCard = ({ data, images, onClick }) => {
                                 }}
                             >
                                 {data.templateName || data.name}
+                                {data.account && (
+                                    <TooltipWithParser
+                                        title={'Owner account: ' + data.account}
+                                    />
+                                )}                                
                             </Typography>
                         </div>
                         {data.description && (

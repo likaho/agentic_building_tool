@@ -30,6 +30,13 @@ export interface IChatFlow {
     apiConfig?: string
     category?: string
     type?: ChatflowType
+    ownerAddress?: string
+    tokenId?: string
+    nftAddress?: string    
+    isPublished?: boolean
+    usageCount?: number
+    gas?: number
+    description?: string
 }
 
 export interface IChatMessage {
@@ -68,6 +75,7 @@ export interface ITool {
     iconSrc?: string
     schema?: string
     func?: string
+    account?: string
     updatedDate: Date
     createdDate: Date
 }

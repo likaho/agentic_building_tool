@@ -135,7 +135,7 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
                     avatar={item.chip.avatar && <Avatar>{item.chip.avatar}</Avatar>}
                 />
             )}
-            {item.isBeta && (
+            {/* {item.isBeta && (
                 <Chip
                     sx={{
                         width: 'max-content',
@@ -146,7 +146,7 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
                     }}
                     label={'BETA'}
                 />
-            )}
+            )} */}
         </ListItemButton>
     )
 }

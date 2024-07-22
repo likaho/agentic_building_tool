@@ -14,7 +14,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
 import { CodeEditor } from '@/ui-component/editor/CodeEditor'
 import HowToUseFunctionDialog from './HowToUseFunctionDialog'
-
 // Icons
 import { IconX, IconFileDownload, IconPlus } from '@tabler/icons-react'
 
@@ -29,6 +28,7 @@ import useApi from '@/hooks/useApi'
 import useNotifier from '@/utils/useNotifier'
 import { generateRandomGradient, formatDataGridRows } from '@/utils/genericHelper'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
+import { connectToMetaMask} from '../../utils/metamaskHelper'
 
 const exampleAPIFunc = `/*
 * You can use any libraries imported in Flowise
@@ -54,6 +54,7 @@ try {
     console.error(error);
     return '';
 }`
+ 
 
 const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, setError }) => {
     const portalElement = document.getElementById('portal')
@@ -77,6 +78,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
     const [toolIcon, setToolIcon] = useState('')
     const [toolSchema, setToolSchema] = useState([])
     const [toolFunc, setToolFunc] = useState('')
+    const [toolAccount, setToolAccount] = useState('')
     const [showHowToDialog, setShowHowToDialog] = useState(false)
 
     const deleteItem = useCallback(
@@ -154,6 +156,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
             setToolId(getSpecificToolApi.data.id)
             setToolName(getSpecificToolApi.data.name)
             setToolDesc(getSpecificToolApi.data.description)
+            setToolAccount(getSpecificToolApi.data.account)
             setToolSchema(formatDataGridRows(getSpecificToolApi.data.schema))
             if (getSpecificToolApi.data.func) setToolFunc(getSpecificToolApi.data.func)
             else setToolFunc('')
@@ -161,7 +164,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
     }, [getSpecificToolApi.data])
 
     useEffect(() => {
-        if (getSpecificToolApi.error && setError) {
+        if (getSpecificToolApi.error) {
             setError(getSpecificToolApi.error)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,6 +177,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
             setToolName(dialogProps.data.name)
             setToolDesc(dialogProps.data.description)
             setToolIcon(dialogProps.data.iconSrc)
+            setToolAccount(dialogProps.data.account)
             setToolSchema(formatDataGridRows(dialogProps.data.schema))
             if (dialogProps.data.func) setToolFunc(dialogProps.data.func)
             else setToolFunc('')
@@ -185,6 +189,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
             setToolName(dialogProps.data.name)
             setToolDesc(dialogProps.data.description)
             setToolIcon(dialogProps.data.iconSrc)
+            setToolAccount(dialogProps.data.account)
             setToolSchema(formatDataGridRows(dialogProps.data.schema))
             if (dialogProps.data.func) setToolFunc(dialogProps.data.func)
             else setToolFunc('')
@@ -193,6 +198,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
             setToolName(dialogProps.data.name)
             setToolDesc(dialogProps.data.description)
             setToolIcon(dialogProps.data.iconSrc)
+            setToolAccount(dialogProps.data.account)
             setToolSchema(formatDataGridRows(dialogProps.data.schema))
             if (dialogProps.data.func) setToolFunc(dialogProps.data.func)
             else setToolFunc('')
@@ -202,6 +208,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
             setToolName('')
             setToolDesc('')
             setToolIcon('')
+            setToolAccount('')
             setToolSchema([])
             setToolFunc('')
         }
@@ -259,6 +266,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
                 color: generateRandomGradient(),
                 schema: JSON.stringify(toolSchema),
                 func: toolFunc,
+                account: toolAccount,
                 iconSrc: toolIcon
             }
             const createResp = await toolsApi.createNewTool(obj)
@@ -304,6 +312,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
                 description: toolDesc,
                 schema: JSON.stringify(toolSchema),
                 func: toolFunc,
+                account: toolAccount,
                 iconSrc: toolIcon
             })
             if (saveResp.data) {
@@ -389,6 +398,10 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
         }
     }
 
+    const handleConnectToMetaMask = async () => {
+        const accountAddress = await connectToMetaMask()
+        setToolAccount(accountAddress)
+    }
     const component = show ? (
         <Dialog
             fullWidth
@@ -452,6 +465,36 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
                             onChange={(e) => setToolDesc(e.target.value)}
                         />
                     </Box>
+                    <Box>
+                        <Stack sx={{ position: 'relative', alignItems: 'center' }} direction='row'>
+                            <Typography variant='overline'>
+                                Account Address
+                                <span style={{ color: 'red' }}>&nbsp;*</span>
+                            </Typography>
+                            <TooltipWithParser
+                                title={'Your citrea account address to receive token and NFT when tool is created or used by others.'}
+                            />
+                        </Stack>
+                        <Stack sx={{ position: 'relative', alignItems: 'center' }} direction='row'>
+                            <OutlinedInput
+                                id='toolAccount'
+                                type='string'
+                                fullWidth
+                                disabled={dialogProps.type === 'TEMPLATE'}
+                                placeholder='Your account will receive token and NFT when tool is created or used by others.'
+                                multiline={false}
+                                rows={1}
+                                value={toolAccount}
+                                name='toolDesc'
+                                onChange={(e) => setToolAccount(e.target.value)}
+                            />
+                            {/* {dialogProps.type === 'TEMPLATE' && ( */}
+                                <StyledButton style={{ marginLeft: 10 }} color='secondary' variant='contained' onClick={handleConnectToMetaMask}>
+                                    Connect
+                                </StyledButton>
+                            {/* )}                         */}
+                        </Stack>
+                    </Box>                    
                     <Box>
                         <Stack sx={{ position: 'relative' }} direction='row'>
                             <Typography variant='overline'>Tool Icon Source</Typography>

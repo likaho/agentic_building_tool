@@ -53,13 +53,15 @@ import { usePrompt } from '@/utils/usePrompt'
 
 // const
 import { FLOWISE_CREDENTIAL_ID } from '@/store/constant'
+import { connectToMetaMask } from '../../utils/metamaskHelper'
+
 
 const nodeTypes = { customNode: CanvasNode, stickyNote: StickyNote }
 const edgeTypes = { buttonedge: ButtonEdge }
 
 // ==============================|| CANVAS ||============================== //
 
-const Canvas = () => {
+export const Canvas = () => {
     const theme = useTheme()
     const navigate = useNavigate()
 
@@ -196,6 +198,41 @@ const Canvas = () => {
                 })
             }
         }
+    }
+
+    const handlePublishFlow = async (chatflowDescription, chatflowOwnerAddress, chatflowGas) => {
+        if (reactFlowInstance) {
+            const nodes = reactFlowInstance.getNodes().map((node) => {
+                const nodeData = cloneDeep(node.data)
+                if (Object.prototype.hasOwnProperty.call(nodeData.inputs, FLOWISE_CREDENTIAL_ID)) {
+                    nodeData.credential = nodeData.inputs[FLOWISE_CREDENTIAL_ID]
+                    nodeData.inputs = omit(nodeData.inputs, [FLOWISE_CREDENTIAL_ID])
+                }
+                node.data = {
+                    ...nodeData,
+                    selected: false
+                }
+                return node
+            })
+
+            const rfInstanceObject = reactFlowInstance.toObject()
+            rfInstanceObject.nodes = nodes
+            const flowData = JSON.stringify(rfInstanceObject)
+
+            if (chatflow.id) {
+                const updateBody = {
+                    description: chatflowDescription,
+                    ownerAddress: chatflowOwnerAddress,
+                    gas: chatflowGas,
+                    flowData
+                }
+                console.log(updateBody)
+                const response = await updateChatflowApi.request(chatflow.id, updateBody)
+                console.log(response)
+                return response
+            }
+        }
+
     }
 
     const handleSaveFlow = (chatflowName) => {
@@ -529,6 +566,7 @@ const Canvas = () => {
                         <CanvasHeader
                             chatflow={chatflow}
                             handleSaveFlow={handleSaveFlow}
+                            handlePublishFlow={handlePublishFlow}
                             handleDeleteFlow={handleDeleteFlow}
                             handleLoadFlow={handleLoadFlow}
                             isAgentCanvas={isAgentCanvas}
