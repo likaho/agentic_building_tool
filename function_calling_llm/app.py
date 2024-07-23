@@ -8,13 +8,15 @@ from flask_cors import CORS
 import chromadb
 
 load_dotenv()
+chroma_db_path = os.getenv("CHROMA_DB_PATH")
+collection_name = os.getenv("COLLECTION_NAME")
 
 app = Flask(__name__)
 CORS(app)
 
 def delete_agent_or_chatflow(type: str, id: str):
-  chroma_client = chromadb.PersistentClient(path="agenticprotocol/vectordb")
-  collection = chroma_client.get_or_create_collection(name="marketplace")
+  chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+  collection = chroma_client.get_or_create_collection(name=collection_name)
   results = collection.get(ids=[id])
   if len(results["ids"]) > 0:
     collection.delete(ids=[id])
@@ -34,7 +36,7 @@ def create_agent_or_chatflow(type: str):
     return_description = request.json['return_description'] #e.g. The weather forecast.
     id = request.json['id']
 
-    chroma_client = chromadb.PersistentClient(path="agenticprotocol/vectordb")
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     function_name = f"def {name}(query):"
     function_doc = \
     f'''
@@ -53,7 +55,7 @@ def create_agent_or_chatflow(type: str):
     hash = str(generate_hash(function_doc))
     doc_metadata = {"function_name": function_name, "hash": hash, "type": type}
 
-    collection = chroma_client.get_or_create_collection(name="marketplace")
+    collection = chroma_client.get_or_create_collection(name=collection_name)
     collection.upsert(
         ids=[id],
         documents=[function_doc],
@@ -84,10 +86,6 @@ def chat_completion(user_query: str, chatId: str):
   llm_url = os.getenv("GALADRIEL_URL")
   response = requests.post(llm_url, json = json_body)  
   return response
-  # if(response.status_code == 200):
-  #   return response.text
-  # else:
-  #    return response.status_code
 
 @app.route('/api/v1/prediction/123', methods=['POST'])
 def useService():
@@ -110,24 +108,6 @@ def useService():
       payload = json.dumps({"question":user_query, "chatId": str(chatId) })
       response = requests.post(marketplace_url, data=payload, headers={'Content-Type': 'application/json'})
       return response.json()
-      # # call the function
-      # openapi_url = function_details["metadatas"][0][0]["openapi_uri"]
-      # service_url = function_details["metadatas"][0][0]["end_point"]
-      # import_statement = function_details["metadatas"][0][0]["import_statement"]
-
-      # output_dir = generate_hash(clean_url(openapi_url))
-      # generate_open_api_services(openapi_url, service_url, output_dir)
-
-      # exec(import_statement)
-      # result = eval(function_call)
-
-      # from threading import Thread
-      # # Create a thread object with the worker function and data
-      # thread = Thread(target=remove_openapi_files, args=(output_dir,))
-      # thread.start()  
-      # return jsonify(result)
-
-
      
 if __name__ == '__main__':
   app.run(debug=True)

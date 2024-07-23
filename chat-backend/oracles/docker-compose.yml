@@ -1,4 +1,0 @@
-services:
-  oracle:
-    build: .
-    restart: "unless-stopped"
