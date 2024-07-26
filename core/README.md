@@ -14,19 +14,18 @@
 
 ```bash
 
-git clone https://github.com/likaho/AgenticProtocol.git
+git clone https://github.com/likaho/agentic_protocol.git
 
 ```
 
   
 
-2. Go into individual repository folder, for example core/packages/ui
-
+2. Go into core repository folder
   
 
 ```bash
 
-cd packages/ui
+cd core
 
 ```
 
@@ -42,9 +41,17 @@ pnpm install
 
 ```
 
-  
+4. Create.env files
 
-4. Build all the code:
+- Create `.env` file and specify the `VITE_PORT` (refer to `.env.example`) in `packages/ui`
+
+- Create `.env` file and specify the `PORT` (refer to `.env.example`) in `packages/server`
+- In the.env file, you need to set `PRIVATE_KEY` to a private key that is used to sign transactions on behalf of users during publishing the function definition to the lighthouse storage network and creating a NFT on Citrea network.
+
+- For creating a wallet in Citrea network, please go to [https://docs.citrea.xyz/user-guide/how-to-use-bridge](https://docs.citrea.xyz/user-guide/how-to-use-bridge)
+- For lighthouse, please go to [https://files.lighthouse.storage](https://files.lighthouse.storage)
+  
+6. Build all the code:
 
   
 
@@ -56,43 +63,23 @@ pnpm build
 
   
 
-5. Start the app:
+6. For development build and start the app:
 
   
 
 ```bash
 
-pnpm start
+pnpm run dev
 
 ```
 
   
 
-You can now access the app on [http://localhost:8080](http://localhost:8080)
+You can now access the app on [http://localhost:3032](http://localhost:3032)
 
   
 
-6. For development build:
-
-  
-
-- Create `.env` file and specify the `VITE_PORT` (refer to `.env.example`) in `packages/ui`
-
-- Create `.env` file and specify the `PORT` (refer to `.env.example`) in `packages/server`
-
-- Run
-
-  
-
-```bash
-
-pnpm dev
-
-```
-
-  
-
-Any code changes will reload the app automatically on [http://localhost:8080](http://localhost:8080)
+Any code changes will reload the app automatically on [http://localhost:3032](http://localhost:3032)
 
   
   
