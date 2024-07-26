@@ -1,4 +1,3 @@
-```markdown
 # Welcome to Function Calling LLM
 
 ## Getting Started
