@@ -17,14 +17,17 @@ AgenticProtocol integrates decentralized AI capabilities using various APIs for 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/likaho/AgenticProtocol.git
+git clone https://github.com/likaho/agentic_protocol.git
 cd chat-backend
 ```
 
-### 2. Run Server:
+### 2. Create .env file:
+Create .env file and specify the PRIVATE_KEY (refer to .env.example) in chat-backend
+For creating a wallet in Galadriel network, please refer to [https://docs.galadriel.com/quickstart](https://docs.galadriel.com/quickstart)
+
+### 3. Run Server:
 
 ```bash
-cd zkml_agents
 npm start
 ```
 
